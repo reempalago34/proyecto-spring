@@ -9,9 +9,11 @@ import co.sena.adso.fincasapi.repository.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +27,9 @@ class UsuarioServiceTest {
 
     @Mock
     private UsuarioRepository usuarioRepository;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UsuarioService usuarioService;
@@ -63,11 +68,15 @@ class UsuarioServiceTest {
     @Test
     void create_shouldSaveAndReturnDTO() {
         UsuarioRequestDTO dto = new UsuarioRequestDTO("nuevo@email.com", "abcdef", "Nuevo Usuario");
+        when(passwordEncoder.encode("abcdef")).thenReturn("$2a$10$hashEncriptado");
         when(usuarioRepository.existsByEmail("nuevo@email.com")).thenReturn(false);
         when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
         UsuarioResponseDTO result = usuarioService.create(dto);
         assertThat(result).isNotNull();
-        verify(usuarioRepository, times(1)).save(any(Usuario.class));
+        verify(passwordEncoder).encode("abcdef");
+        ArgumentCaptor<Usuario> captor = ArgumentCaptor.forClass(Usuario.class);
+        verify(usuarioRepository, times(1)).save(captor.capture());
+        assertThat(captor.getValue().getPassword()).isEqualTo("$2a$10$hashEncriptado");
     }
 
     @Test

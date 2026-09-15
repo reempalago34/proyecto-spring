@@ -1,11 +1,35 @@
 ### ═══════════════════════════════════════════════════════════
 ### FINCAS API — 20+ Endpoints de ejemplo
 ### ═══════════════════════════════════════════════════════════
-### REQUISITOS: PostgreSQL corriendo en localhost:5434 y la API en localhost:31026
-### EJECUTAR: .\mvnw spring-boot:run
+### REQUISITOS: La API en localhost:31026. Perfil por defecto = H2 en memoria (no requiere PostgreSQL).
+###              PostgreSQL: activar perfil "dev" (spring.profiles.active=dev).
+### EJECUTAR: .\mvnw spring-boot:run (Windows)  o  ./mvnw spring-boot:run (Linux/macOS)
 ### SWAGGER:  http://localhost:31026/swagger-ui.html
 ### ═══════════════════════════════════════════════════════════
 @host = http://localhost:31026
+
+### ═══════════════════════════════════════
+### 0. AUTENTICACIÓN JWT (perfil prod)
+### ═══════════════════════════════════════
+
+### 0a. Crear usuario (la contraseña se guarda encriptada BCrypt)
+POST {{host}}/api/usuarios
+Content-Type: application/json
+
+{
+  "email": "juan@email.com",
+  "password": "123456",
+  "nombre": "Juan Pérez"
+}
+
+### 0b. Login — obtener token JWT (perfil prod: app.security.enabled=true)
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "juan@email.com",
+  "password": "123456"
+}
 
 ### ═══════════════════════════════════════
 ### 1. ENTIDADES BASE (Fincas, Cultivos, N:M)

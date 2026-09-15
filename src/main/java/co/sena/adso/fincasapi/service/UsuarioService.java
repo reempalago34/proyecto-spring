@@ -6,6 +6,7 @@ import co.sena.adso.fincasapi.entity.Usuario;
 import co.sena.adso.fincasapi.exception.BusinessException;
 import co.sena.adso.fincasapi.exception.ResourceNotFoundException;
 import co.sena.adso.fincasapi.repository.UsuarioRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -14,9 +15,11 @@ import java.util.List;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional(readOnly = true)
@@ -38,7 +41,7 @@ public class UsuarioService {
         if (usuarioRepository.existsByEmail(dto.email())) {
             throw new BusinessException("El email " + dto.email() + " ya está registrado");
         }
-        Usuario usuario = new Usuario(dto.email(), dto.password(), dto.nombre());
+        Usuario usuario = new Usuario(dto.email(), passwordEncoder.encode(dto.password()), dto.nombre());
         return UsuarioResponseDTO.fromEntity(usuarioRepository.save(usuario));
     }
 

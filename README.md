@@ -5,23 +5,25 @@ Proyecto base de la Guía SENA ADSO. Está pensado para que puedas leer una peti
 ## Requisitos
 
 - JDK 21 o superior.
-- PostgreSQL 16 o superior en `localhost:5434`.
+- Base de datos: por defecto la API arranca con **H2 en memoria** (cero configuración). Para usar PostgreSQL en su lugar, activa el perfil `dev` y ten PostgreSQL 16+ en `localhost:5434`.
 - API Spring Boot en `http://localhost:31026` (puerto registrado para esta guía).
-- PowerShell 7.
 
 ## Arranque reproducible
 
-1. Copia `.env.example` como `.env` y revisa usuario, contraseña y base `adso_fincas`.
-2. Abre PowerShell en esta carpeta.
-3. Ejecuta:
+1. (Opcional) Copia `.env.example` como `.env` y revisa credenciales si usarás PostgreSQL.
+2. Con la terminal en esta carpeta, ejecuta:
 
-```powershell
-.\mvnw spring-boot:run
+```bash
+./mvnw spring-boot:run
 ```
+
+El perfil activo por defecto es `h2` (base en memoria: las tablas se crean solas y `DataSeeder` inserta datos de prueba en cada arranque). Consola de H2 disponible en `http://localhost:31026/h2-console` (JDBC URL `jdbc:h2:mem:fincas`, usuario `sa`).
+
+Para usar PostgreSQL: `./mvnw spring-boot:run -Dspring-boot.run.profiles=dev`.
 
 El proyecto usa `spring-boot-devtools`. El IDE debe compilar automáticamente los `.java`; DevTools detecta los `.class` compilados y reinicia la aplicación. La consola debe mostrar `LiveReload server is running on port 35729`.
 
-En desarrollo `app.security.enabled=false` para que puedas practicar CRUD con cURL sin fabricar un token. En un entorno protegido usa el perfil de producción, donde la cadena de seguridad exige autenticación JWT.
+En desarrollo `app.security.enabled=false` para que puedas practicar CRUD con cURL sin fabricar un token. En un entorno protegido usa el perfil de producción, donde la cadena de seguridad exige autenticación JWT: primero crea un usuario (`POST /api/usuarios`) y luego haz login en `POST /api/auth/login` para obtener el token `Bearer`.
 
 ## Recorrido recomendado
 
